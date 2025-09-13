@@ -1,5 +1,7 @@
 const booksCompleted = [];
 const booksUnCompleted = [];
+const editBooksCompletedData = [];
+const editBooksUnCompletedData = [];
 const body = document.getElementById("myBody");
 const bookForm = document.getElementById("bookForm");
 const bookFormIsComplete = document.getElementById("bookFormIsComplete");
@@ -12,27 +14,29 @@ const authorInput = document.querySelector(
 const yearInput = document.querySelector('[data-testid="bookFormYearInput"]');
 const searchBook = document.getElementById("searchBook");
 const render = "render";
+const save = "save";
+const fieldSearch = document.getElementById("searchBookTitle");
 
 document.addEventListener("DOMContentLoaded", function () {
   bookForm.addEventListener("submit", function (event) {
     event.preventDefault();
-    
+
     addValueBooks();
     addBooksData();
     showUnCompleted();
     showCompleted();
-    
+
     titleInput.value = "";
     authorInput.value = "";
     yearInput.value = "";
-    
+
     checkInput();
   });
-  
+
   searchBook.addEventListener("submit", function (event) {
     event.preventDefault();
     const searchBookTitle = document
-    .getElementById("searchBookTitle")
+      .getElementById("searchBookTitle")
       .value.trim();
     const resultTitle = document.getElementById("resultTitle");
     const resultAuthor = document.getElementById("resultAuthor");
@@ -72,16 +76,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   });
-  
+
   if (typeof localStorage === "undefined") {
     body.innerHTML =
       '<h1 style="color: red">Browser Tidak Support Local Storage</h1>';
-    } else {
-      loadStorageData();
-    }
-    
-    showUnCompleted();
-    showCompleted();
+  } else {
+    loadStorageData();
+  }
+
+  showUnCompleted();
+  showCompleted();
 });
 
 function checkInput() {
@@ -194,14 +198,14 @@ bookFormIsComplete.addEventListener("click", function () {
 document.addEventListener(render, function () {});
 
 function showUnCompleted() {
-  const incompleteBookList = document.getElementById("incompleteBookList");
-  incompleteBookList.innerHTML = "";
+  const containerUnCompleteBookList = document.getElementById("containerUnCompleteBookList");
+  containerUnCompleteBookList.innerHTML = "";
 
   for (const data of booksUnCompleted) {
     const container = document.createElement("div");
     container.setAttribute("data-bookid", `${data.id}`);
     container.setAttribute("data-testid", "bookItem");
-    container.classList.add('listItem');
+    container.classList.add("listItem");
 
     const title = document.createElement("h3");
     title.setAttribute("data-testid", "bookItemTitle");
@@ -221,15 +225,15 @@ function showUnCompleted() {
     isCompletedButton.setAttribute("data-testid", "bookItemIsCompleteButton");
     isCompletedButton.classList.add("button1");
     isCompletedButton.innerText = "Selesai Dibaca";
-    isCompletedButton.addEventListener('click', function () {
+    isCompletedButton.addEventListener("click", function () {
       updateStatusToCompleted(data.id);
-    })
+    });
 
     const deleteButton = document.createElement("button");
     deleteButton.setAttribute("data-testid", "bookItemDeleteButton");
     deleteButton.classList.add("button2");
     deleteButton.innerText = "Hapus Buku";
-    deleteButton.addEventListener('click', function () {
+    deleteButton.addEventListener("click", function () {
       deleteDataBookUnCompleted(data.id);
     });
 
@@ -237,24 +241,31 @@ function showUnCompleted() {
     editButton.setAttribute("data-testid", "bookItemEditButton");
     editButton.classList.add("button3");
     editButton.innerText = "Edit Buku";
+    editButton.addEventListener("click", function () {
+      editDataIsUnCompleted(data.id, data.title, data.author, data.year);
+    });
 
     buttonContainer.append(isCompletedButton, deleteButton, editButton);
 
     container.append(title, author, year, buttonContainer);
 
-    incompleteBookList.appendChild(container)
+    containerUnCompleteBookList.appendChild(container);
   }
 }
 
 function showCompleted() {
-  const completeBookList = document.getElementById("completeBookList");
-  completeBookList.innerHTML = "";
+  const containerCompleteBookList = document.getElementById(
+    "containerCompleteBookList"
+  );
+  containerCompleteBookList.innerHTML = "";
 
   for (const data of booksCompleted) {
+    const br = document.createElement("br");
+
     const container = document.createElement("div");
     container.setAttribute("data-bookid", `${data.id}`);
     container.setAttribute("data-testid", "bookItem");
-    container.classList.add('listItem');
+    container.classList.add("listItem");
 
     const title = document.createElement("h3");
     title.setAttribute("data-testid", "bookItemTitle");
@@ -271,18 +282,21 @@ function showCompleted() {
     const buttonContainer = document.createElement("div");
 
     const isUnCompletedButton = document.createElement("button");
-    isUnCompletedButton.setAttribute("data-testid", "bookItemIsUnCompleteButton");
+    isUnCompletedButton.setAttribute(
+      "data-testid",
+      "bookItemIsUnCompleteButton"
+    );
     isUnCompletedButton.classList.add("button1");
     isUnCompletedButton.innerText = "Belum Selesai";
-    isUnCompletedButton.addEventListener('click', function () {
+    isUnCompletedButton.addEventListener("click", function () {
       updateStatusToUnCompleted(data.id);
-    })
+    });
 
     const deleteButton = document.createElement("button");
     deleteButton.setAttribute("data-testid", "bookItemDeleteButton");
     deleteButton.classList.add("button2");
     deleteButton.innerText = "Hapus Buku";
-    deleteButton.addEventListener('click', function () {
+    deleteButton.addEventListener("click", function () {
       deleteDataBookCompleted(data.id);
     });
 
@@ -290,13 +304,15 @@ function showCompleted() {
     editButton.setAttribute("data-testid", "bookItemEditButton");
     editButton.classList.add("button3");
     editButton.innerText = "Edit Buku";
+    editButton.addEventListener("click", function () {
+      editDataIsCompleted(data.id, data.title, data.author, data.year);
+    });
 
     buttonContainer.append(isUnCompletedButton, deleteButton, editButton);
 
     container.append(title, author, year, buttonContainer);
 
-    completeBookList.appendChild(container);
-    
+    containerCompleteBookList.appendChild(container);
   }
 }
 
@@ -380,5 +396,273 @@ function updateData(isComplete) {
     localStorage.setItem("Completed", completedParsed);
   } else {
     localStorage.setItem("Uncompleted", unCompletedParsed);
+  }
+}
+
+function searchingBook() {
+  const searchBookTitle = document
+    .getElementById("searchBookTitle")
+    .value.trim();
+  const resultTitle = document.getElementById("resultTitle");
+  const resultAuthor = document.getElementById("resultAuthor");
+  const resultYear = document.getElementById("resultYear");
+  const resultIsCompleted = document.getElementById("resultIsCompleted");
+
+  if (searchBookTitle == "") {
+    resultTitle.innerText = "";
+    resultAuthor.innerText = "";
+    resultYear.innerText = "";
+    resultIsCompleted.innerText = "";
+  }
+}
+
+fieldSearch.addEventListener("input", function () {
+  searchingBook();
+});
+
+function editDataIsCompleted(bookId, bookTitle, bookAuthor, bookYear) {
+  const id = bookId;
+  const isCompleted = [];
+
+  const containerCompleteBookList = document.getElementById(
+    "containerCompleteBookList"
+  );
+  const editedBook = findBookIdIsCompleted(bookId);
+
+  containerCompleteBookList.innerHTML = "";
+
+  const form = document.createElement("form");
+  form.setAttribute("id", "editBookCompleted");
+
+  const content = document.createElement("div");
+  content.setAttribute("class", "content");
+
+  const labelTitle = document.createElement("label");
+  labelTitle.setAttribute("for", "editBookTitle");
+  labelTitle.innerText = "Judul";
+
+  const editTitle = document.createElement("input");
+  editTitle.setAttribute("type", "text");
+  editTitle.setAttribute("id", "editBookTitle");
+  editTitle.value = `${bookTitle}`;
+
+  const labelAuthor = document.createElement("label");
+  labelAuthor.setAttribute("for", "editBookAuthor");
+  labelAuthor.innerText = "Penulis";
+
+  const editAuthor = document.createElement("input");
+  editAuthor.setAttribute("type", "text");
+  editAuthor.setAttribute("id", "editBookAuthor");
+  editAuthor.value = `${bookAuthor}`;
+
+  const labelYear = document.createElement("label");
+  labelYear.setAttribute("for", "editBookYear");
+  labelYear.innerText = "Tahun";
+
+  const editYear = document.createElement("input");
+  editYear.setAttribute("type", "number");
+  editYear.setAttribute("id", "editBookYear");
+  editYear.value = `${bookYear}`;
+
+  const submitEdit = document.createElement("button");
+  submitEdit.setAttribute("type", "submit");
+  submitEdit.setAttribute("id", "buttonSubmitEdit");
+  submitEdit.setAttribute("class", "button1 btn-create btn-edit");
+  submitEdit.setAttribute("form", "editBookCompleted");
+  submitEdit.innerText = "Submit";
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    for (let i = 0; i < booksCompleted.length; i++) {
+      if (booksCompleted[i].id === id) {
+        if (isCompleted[0] === undefined) {
+          isCompleted.push(booksCompleted[i].isComplete);
+        } else {
+          isCompleted[0] = booksCompleted[i].isComplete;
+        }
+      }
+    }
+    processEdit(
+      id,
+      editTitle.value.trim(),
+      editAuthor.value.trim(),
+      editYear.value.trim(),
+      isCompleted[0]
+    );
+  });
+
+  content.append(
+    labelTitle,
+    editTitle,
+    labelAuthor,
+    editAuthor,
+    labelYear,
+    editYear,
+    submitEdit
+  );
+  form.append(content);
+  containerCompleteBookList.append(form);
+}
+
+function editDataIsUnCompleted(bookId, bookTitle, bookAuthor, bookYear) {
+  const id = bookId;
+  const isUnCompleted = [];
+
+  const containerUnCompleteBookList = document.getElementById(
+    "containerUnCompleteBookList"
+  );
+
+  containerUnCompleteBookList.innerHTML = "";
+
+  const form = document.createElement("form");
+  form.setAttribute("id", "editBookUnCompleted");
+
+  const content = document.createElement("div");
+  content.setAttribute("class", "content");
+
+  const labelTitle = document.createElement("label");
+  labelTitle.setAttribute("for", "editBookTitle");
+  labelTitle.innerText = "Judul";
+
+  const editTitle = document.createElement("input");
+  editTitle.setAttribute("type", "text");
+  editTitle.setAttribute("id", "editBookTitle");
+  editTitle.value = `${bookTitle}`;
+
+  const labelAuthor = document.createElement("label");
+  labelAuthor.setAttribute("for", "editBookAuthor");
+  labelAuthor.innerText = "Penulis";
+
+  const editAuthor = document.createElement("input");
+  editAuthor.setAttribute("type", "text");
+  editAuthor.setAttribute("id", "editBookAuthor");
+  editAuthor.value = `${bookAuthor}`;
+
+  const labelYear = document.createElement("label");
+  labelYear.setAttribute("for", "editBookYear");
+  labelYear.innerText = "Tahun";
+
+  const editYear = document.createElement("input");
+  editYear.setAttribute("type", "number");
+  editYear.setAttribute("id", "editBookYear");
+  editYear.value = `${bookYear}`;
+
+  const submitEdit = document.createElement("button");
+  submitEdit.setAttribute("type", "submit");
+  submitEdit.setAttribute("id", "buttonSubmitEdit");
+  submitEdit.setAttribute("class", "button1 btn-create btn-edit");
+  submitEdit.setAttribute("form", "editBookUnCompleted");
+  submitEdit.innerText = "Submit";
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    for (let i = 0; i < booksUnCompleted.length; i++) {
+      if (booksUnCompleted[i].id === id) {
+        if (isUnCompleted[0] === undefined) {
+          isUnCompleted.push(booksUnCompleted[i].isComplete);
+        } else {
+          isUnCompleted[0] = booksUnCompleted[i].isComplete;
+        }
+      }
+    }
+    processEdit(
+      id,
+      editTitle.value.trim(),
+      editAuthor.value.trim(),
+      editYear.value.trim(),
+      isUnCompleted[0]
+    );
+  });
+
+  content.append(
+    labelTitle,
+    editTitle,
+    labelAuthor,
+    editAuthor,
+    labelYear,
+    editYear,
+    submitEdit
+  );
+  form.append(content);
+  containerUnCompleteBookList.append(form);
+}
+
+function processEdit(bookId, bookTitle, bookAuthor, bookYear, status) {
+  if (status) {
+    if (editBooksCompletedData[0] === undefined) {
+      editBooksCompletedData.push({
+        title: bookTitle,
+        author: bookAuthor,
+        year: bookYear,
+        isCompleted: status,
+      });
+    } else {
+      editBooksCompletedData[0].title = bookTitle;
+      editBooksCompletedData[0].author = bookAuthor;
+      editBooksCompletedData[0].year = bookYear;
+      editBooksCompletedData[0].isCompleted = status;
+    }
+  } else {
+    if (editBooksUnCompletedData[0] === undefined) {
+      editBooksUnCompletedData.push({
+        title: bookTitle,
+        author: bookAuthor,
+        year: bookYear,
+        isCompleted: status,
+      });
+    } else {
+      editBooksUnCompletedData[0].title = bookTitle;
+      editBooksUnCompletedData[0].author = bookAuthor;
+      editBooksUnCompletedData[0].year = bookYear;
+      editBooksUnCompletedData[0].isCompleted = status;
+    }
+  }
+
+  const sameShelfCompleted = booksCompleted.some(
+    (data) => data.title === bookTitle && data.id !== bookId
+  );
+
+  const sameShelfUnCompleted = booksUnCompleted.some(
+    (data) => data.title === bookTitle && data.id !== bookId
+  );
+
+  const differentShelf = status
+    ? booksUnCompleted.some((data) => data.title === bookTitle)
+    : booksCompleted.some((data) => data.title === bookTitle);
+
+  if (status) {
+    if (sameShelfCompleted) {
+      alert("Terjadi duplikasi buku di rak Completed, mohon untuk diganti!");
+    } else if (differentShelf) {
+      alert(
+        "Data sudah ada di rak Uncompleted, mohon untuk diubah atau diganti!"
+      );
+    } else {
+      for (let i = 0; i < booksCompleted.length; i++) {
+        if (booksCompleted[i].id === bookId) {
+          booksCompleted[i].title = editBooksCompletedData[0].title;
+          booksCompleted[i].author = editBooksCompletedData[0].author;
+          booksCompleted[i].year = editBooksCompletedData[0].year;
+        }
+      }
+      updateData(status);
+      showCompleted();
+    }
+  } else {
+    if (sameShelfUnCompleted) {
+      alert("Terjadi duplikasi buku di rak UnCompleted, mohon untuk diganti!");
+    } else if (differentShelf) {
+      alert(
+        "Data sudah ada di rak Completed, mohon untuk diubah atau diganti!"
+      );
+    } else {
+      for (let i = 0; i < booksUnCompleted.length; i++) {
+        if (booksUnCompleted[i].id === bookId) {
+          booksUnCompleted[i].title = editBooksUnCompletedData[0].title;
+          booksUnCompleted[i].author = editBooksUnCompletedData[0].author;
+          booksUnCompleted[i].year = editBooksUnCompletedData[0].year;
+        }
+      }
+      updateData(status);
+      showUnCompleted();
+    }
   }
 }

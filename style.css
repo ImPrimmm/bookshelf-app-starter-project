@@ -56,6 +56,10 @@ header {
     flex-direction: column;
 }
 
+label {
+    margin-top: 8px;
+}
+
 
 input[type="text"], input[type="number"] {
     border-collapse: collapse;
@@ -151,4 +155,8 @@ button {
 
 .button3:hover {
     background-color: #e09922;
+}
+
+.btn-edit {
+    margin-top: 8px;
 }

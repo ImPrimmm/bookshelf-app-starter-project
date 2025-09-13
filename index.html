@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bookshelf App</title>
     <link rel="stylesheet" href="./style.css" />
-
-    <!-- Impor script kamu di sini -->
-    <!-- Lampirkan `defer` jika pemanggilan dilakukan dalam <head> -->
     <script defer src="main.js"></script>
   </head>
   <body id="myBody">
@@ -97,35 +94,21 @@
 
         <section>
           <h2>Belum selesai dibaca</h2>
-
           <div id="incompleteBookList" data-testid="incompleteBookList">
+            <div
+              id="containerUnCompleteBookList"
+              class="containerUnCompleteBookList"
+            ></div>
           </div>
         </section>
 
         <section>
           <h2>Selesai dibaca</h2>
-
           <div id="completeBookList" data-testid="completeBookList">
-            <!-- 
-            Ini adalah struktur HTML untuk masing-masing buku.
-            Pastikan susunan elemen beserta atribut data-testid menyesuaikan seperti contoh ini.
-          -->
-            <div data-bookid="456456456" data-testid="bookItem">
-              <h3 data-testid="bookItemTitle">Judul Buku 2</h3>
-              <p data-testid="bookItemAuthor">Penulis: Penulis Buku 2</p>
-              <p data-testid="bookItemYear">Tahun: 2030</p>
-              <div>
-                <button data-testid="bookItemIsCompleteButton" class="button1">
-                  Selesai dibaca
-                </button>
-                <button data-testid="bookItemDeleteButton" class="button2">
-                  Hapus Buku
-                </button>
-                <button data-testid="bookItemEditButton" class="button3">
-                  Edit Buku
-                </button>
-              </div>
-            </div>
+            <div
+              id="containerCompleteBookList"
+              class="containerCompleteBookList"
+            ></div>
           </div>
         </section>
       </main>
