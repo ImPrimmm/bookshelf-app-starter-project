@@ -18,6 +18,9 @@ const save = "save";
 const fieldSearch = document.getElementById("searchBookTitle");
 
 document.addEventListener("DOMContentLoaded", function () {
+
+  /* adding data to localstorage and show data */
+
   bookForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -32,6 +35,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     checkInput();
   });
+
+  /* search data on array */
 
   searchBook.addEventListener("submit", function (event) {
     event.preventDefault();
@@ -77,6 +82,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  /* if browser don't support localstorage page is showing red text */
+
   if (typeof localStorage === "undefined") {
     body.innerHTML =
       '<h1 style="color: red">Browser Tidak Support Local Storage</h1>';
@@ -87,6 +94,8 @@ document.addEventListener("DOMContentLoaded", function () {
   showUnCompleted();
   showCompleted();
 });
+
+/* if the input column isn't have value, then the button will disabled */
 
 function checkInput() {
   if (
@@ -103,6 +112,8 @@ function checkInput() {
 titleInput.addEventListener("input", checkInput);
 authorInput.addEventListener("input", checkInput);
 yearInput.addEventListener("input", checkInput);
+
+/* add data to array then set to localstorage */
 
 function addValueBooks() {
   const id = Number(new Date());
@@ -157,6 +168,8 @@ function addValueBooks() {
   }
 }
 
+/* add data to local storage */
+
 function addBooksData() {
   const completedParsed = JSON.stringify(booksCompleted);
   const unCompletedParsed = JSON.stringify(booksUnCompleted);
@@ -167,6 +180,8 @@ function addBooksData() {
     localStorage.setItem("Uncompleted", unCompletedParsed);
   }
 }
+
+/* when there is data on localstorage but there's no data on array, then push data to array*/
 
 function loadStorageData() {
   let completedData = JSON.parse(localStorage.getItem("Completed"));
@@ -187,6 +202,8 @@ function loadStorageData() {
   document.dispatchEvent(new Event(render));
 }
 
+/* adding data to completed or uncompleted bookshelf */
+
 bookFormIsComplete.addEventListener("click", function () {
   if (bookFormIsComplete.checked == true) {
     buttonSpan.innerText = "selesai dibaca";
@@ -195,7 +212,11 @@ bookFormIsComplete.addEventListener("click", function () {
   }
 });
 
+/* i forgot what is this for */
+
 document.addEventListener(render, function () {});
+
+/* showing data UnCompleted */
 
 function showUnCompleted() {
   const containerUnCompleteBookList = document.getElementById("containerUnCompleteBookList");
@@ -252,6 +273,8 @@ function showUnCompleted() {
     containerUnCompleteBookList.appendChild(container);
   }
 }
+
+/* showing data Completed */
 
 function showCompleted() {
   const containerCompleteBookList = document.getElementById(
@@ -316,6 +339,8 @@ function showCompleted() {
   }
 }
 
+/* search for Book id for completed shelf*/
+
 function findBookIdIsCompleted(bookId) {
   for (const index in booksCompleted) {
     if (booksCompleted[index].id === bookId) {
@@ -324,6 +349,8 @@ function findBookIdIsCompleted(bookId) {
   }
   return -1;
 }
+
+/* delete data on completed shelf*/
 
 function deleteDataBookCompleted(bookId) {
   const deletedBook = findBookIdIsCompleted(bookId);
@@ -336,6 +363,8 @@ function deleteDataBookCompleted(bookId) {
     updateData(true);
   }
 }
+
+/* move book on Completed shelf to UnCompleted shelf */
 
 function updateStatusToUnCompleted(bookId) {
   const updatedBook = findBookIdIsCompleted(bookId);
@@ -352,6 +381,8 @@ function updateStatusToUnCompleted(bookId) {
   }
 }
 
+/* search for Book id for uncompleted shelf*/
+
 function findBookIdIsUnCompleted(bookId) {
   for (const index in booksUnCompleted) {
     if (booksUnCompleted[index].id === bookId) {
@@ -360,6 +391,8 @@ function findBookIdIsUnCompleted(bookId) {
   }
   return -1;
 }
+
+/* delete data on uncompleted shelf*/
 
 function deleteDataBookUnCompleted(bookId) {
   const deletedBook = findBookIdIsUnCompleted(bookId);
@@ -372,6 +405,8 @@ function deleteDataBookUnCompleted(bookId) {
     updateData(false);
   }
 }
+
+/* move book on UnCompleted shelf to Completed shelf */
 
 function updateStatusToCompleted(bookId) {
   const updatedBook = findBookIdIsUnCompleted(bookId);
@@ -388,6 +423,8 @@ function updateStatusToCompleted(bookId) {
   }
 }
 
+/* update data on localstorage */
+
 function updateData(isComplete) {
   const completedParsed = JSON.stringify(booksCompleted);
   const unCompletedParsed = JSON.stringify(booksUnCompleted);
@@ -398,6 +435,8 @@ function updateData(isComplete) {
     localStorage.setItem("Uncompleted", unCompletedParsed);
   }
 }
+
+/* data show will disappear if the values are deleted */
 
 function searchingBook() {
   const searchBookTitle = document
@@ -419,6 +458,8 @@ function searchingBook() {
 fieldSearch.addEventListener("input", function () {
   searchingBook();
 });
+
+/* show section edit data on Completed Shelf */
 
 function editDataIsCompleted(bookId, bookTitle, bookAuthor, bookYear) {
   const id = bookId;
@@ -503,6 +544,8 @@ function editDataIsCompleted(bookId, bookTitle, bookAuthor, bookYear) {
   containerCompleteBookList.append(form);
 }
 
+/* show section edit data on UnCompleted Shelf */
+
 function editDataIsUnCompleted(bookId, bookTitle, bookAuthor, bookYear) {
   const id = bookId;
   const isUnCompleted = [];
@@ -584,6 +627,8 @@ function editDataIsUnCompleted(bookId, bookTitle, bookAuthor, bookYear) {
   form.append(content);
   containerUnCompleteBookList.append(form);
 }
+
+/* edit validation and process */
 
 function processEdit(bookId, bookTitle, bookAuthor, bookYear, status) {
   if (status) {
